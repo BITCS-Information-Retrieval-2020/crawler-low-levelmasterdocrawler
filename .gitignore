@@ -1,0 +1,6 @@
+# Log Files
+*.log
+# cache
+*/__pycache__
+/.idea/
+*.pyc
