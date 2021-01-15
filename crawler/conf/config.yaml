@@ -43,8 +43,8 @@ DATABASE_COL: crawler
 # 下载文件上传相关配置
 SSH_HOST: 10.4.20.69
 SSH_PORT: 22
-USER_NAME: lyl
-PASSWD: 19980502
+USER_NAME: ***
+PASSWD: *****
 REMOTE_PAPER_PATH_PREFILX: /home/work/crawler/paper/
 REMOTE_VIDEO_PATH_PREFILX: /home/work/crawler/video/
 

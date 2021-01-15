@@ -126,7 +126,7 @@ class MongoManager:
 
 
 class FileManager:
-    def __init__(self, host="10.4.20.69", port=22, user_name="lyl", passwd="19980502"):
+    def __init__(self, host="10.4.20.69", port=22, user_name, passwd):
         self.host = host
         self.port = port
         self.user = user_name
@@ -165,7 +165,7 @@ if __name__ == "__main__":
     mm.select_db("lowermaster")
     mm.select_col("crawler")
     fm = FileManager(host='10.4.20.69', port=22,
-                     user_name='lyl', passwd='19980502')
+                     user_name='***', passwd='***')
     # videos_dir = './test_video/'
     # video_paths = os.listdir(videos_dir)
     # print(video_paths)
