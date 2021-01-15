@@ -1,0 +1,59 @@
+# 爬虫类型
+SPIDER_TYPE: ArxivSpider
+# SPIDER_TYPE: AclwebSpider
+# SPIDER_TYPE: PapersWithCodeSpider
+# SPIDER_TYPE: PaperweeklyCrawlerSpider
+
+# 同时处理的request数量
+CONCURRENT_REQUESTS: 16
+
+# 爬虫pipeline选择
+ITEM_PIPELINES:
+  # arxiv
+ crawler.pipelines.ArxivPDFFetcherPipeline: 1
+ crawler.pipelines.ArxivJsonWriterPipeline: 2
+  # acl
+  # crawler.pipelines.ACLPaperPdfFilePipeline: 1
+  # crawler.pipelines.ACLPaperVideoFilePipeline: 2
+
+  # paperwithcode
+  # crawler.pipelines.PapersWithCodeFilePipeline: 1
+  # paperweekly
+  # crawler.pipelines.PaperweeklyJsonPipeline: 1
+  # common
+  crawler.pipelines.MongoDbPipeline: 10
+
+# 爬虫middleware选择
+DOWNLOADER_MIDDLEWARES:
+  # arxiv
+  crawler.middlewares.ArxivDownloaderMiddleware: 543
+
+# 文件存储位置
+FILES_STORE: ./download/
+
+# 下载超时设置
+DOWNLOAD_TIMEOUT: 300
+
+# mongodb相关配置
+DATABASE_HOST: 10.4.20.69
+DATABASE_PORT: 27017
+DATABASE_NAME: lowermaster
+DATABASE_COL: crawler
+
+# 下载文件上传相关配置
+SSH_HOST: 10.4.20.69
+SSH_PORT: 22
+USER_NAME: lyl
+PASSWD: 19980502
+REMOTE_PAPER_PATH_PREFILX: /home/work/crawler/paper/
+REMOTE_VIDEO_PATH_PREFILX: /home/work/crawler/video/
+
+# 日志配置：
+LOG_LEVEL: DEBUG
+LOG_FILE: ./logs/spiders.log
+
+# arxiv额外配置
+COOKIES_ENABLED: False
+RETRY_ENABLED: True
+RETRY_TIMES: 10
+USER_AGENT: 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36'
