@@ -16,7 +16,7 @@ pass
 | [魏博](https://github.com/Web985)       |            | 数据库，scrapy速度优化         |
 | [李家伟](https://github.com/Captainr22) |            | crossmind网站爬取              |
 | [马放](https://github.com/BD-MF)        |3120201055  | acl网站爬取                    |
-| [宦紫仪]()                              |            | paperwithcode网站爬取          |
+| [宦紫仪](https://github.com/hsnowsunny) |3220200891  | paperwithcode网站爬取          |
 | [蔡建](https://github.com/MrdotCai)     |            | arxiv网站爬取，IP池开发        |
 | [吴为伦]()                              |            | paperweekly网站爬取            |
 
