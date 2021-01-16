@@ -143,7 +143,19 @@ python dataManager.py
 
 #### 3、arxiv
 
-@cj
+- 选择使用Scrapy框架爬取arxiv.org
+
+- 依据规律的URL格式定制爬虫，增量式爬取
+
+  访问arxiv站点可构造适当的URL，按月获取当月的所有论文简要信息，如：https://arxiv.org/list/cs/2001?skip=0&show=1000，表示获取2020年1月从第一个记录开始的1000条论文记录。
+
+  运行爬虫之前，可以自由定制多个URL存于start_urls.txt文件中，作为本次爬取的目标。
+
+  每条论文记录中有该论文的具体展示页面的URL，解析这个URL可以获取论文的标题、作者、摘要等信息生成item反馈给pipeline。
+
+- 每一个item会依次经过三个pipeline——ArxivPDFFetcherPipeline、ArxivJsonWriterPipeline、MongoDbPipeline。它们分别起：获取PDF论文原文并解析原文内容、以json格式纪录每一条item信息以及上传到中心结点的作用。
+
+- 过分频繁的请求会被arxiv网站检测，导致一定时间的IP封禁。所以新增了scrapy的下载中间件：ArxivDownloaderMiddleware。此中间件的任务就是针对每一条请求，首先请求中心服务器的IP池服务获取可用的代理IP，再根据情况选择是否更换代理。由于代理质量的问题，目前完全使用代理的爬取速度不太理想。注意到arxiv网站针对爬虫的IP封禁基于请求频度，故现采用本地IP与代理IP间歇更换的策略，这样既能保证一定程度的爬取速度，同时也能降低本地IP对站点的访问频率。一定比例的本地IP和代理IP使用时间间隙可以让爬虫与arxiv服务器和谐共存，由ArxivDownloaderMiddleware中间件控制。目前的设定代理IP时隙与本地IP时隙比例为3:1，经测试，属arxiv服务器可接受范围。
 
 #### 4、Paper with code
 
