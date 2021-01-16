@@ -137,9 +137,136 @@ python rename.py
 python dataManager.py
 ```
 
-#### 2、ACL
 
-@mf
+#### 2、ACL Anthology
+
+   基于Scrapy框架开发,高效率爬取https://www.aclweb.org/anthology/ 网站上的论文，包括论文基本信息及论文pdf文件、视频文件，支持增量式爬取，使用了代理和ip池等技术。共爬取论文？？？篇，其中视频？？？个，	pdf文件数量为？？？。具体爬取了ACL中acl, anlp, cl, conlp, eacl, emnlp,aacl,findings, naacl, semeval, *sem, tacl, wmt, ws共14个会议。
+   
+   ##### 2.1\. 整体流程
+   经过调查分析，ACL Anthology有两种遍历方法：根据首页面table爬取或者网站提供的bib压缩包，这里考虑到ACL页面为静态页面，其基本信息均在静态页面上，无需对其做更多特殊处理，所以这里选择前者——根据页面table进行遍历爬取.
+   ACL Anthology 论文爬取一共分为两个流程。首先进去ACL主页https://www.aclweb.org/anthology/， 可也看到ACL主页有一个表格，其记录ACL具体年份、具体会议的链接地址，然后进入具体会议具体年份中，每年的ACL具体会议有不同的Contents,进入不同Contents对论文列表遍历爬取。进入一篇论文的主页后，分别用xmpath爬取论文的具体基本信息。 
+   第二个流程是爬取论文的pdf、video等文件，对于ACL中的大部分论文都有pdf链接，少部分没有pdf链接。对于论文pdf，有的文章会有附件，根据url下载即可（判断是否存在，防止重复下载），需要注意的是同一类附件可能有多个。对于ACL的Video文件，其主要有三类：youtube、vimeo和slideslive。近两年的视频主要在slideslive上，先前的大部分视频在vimeo上。需要注意的是需要找出每篇论文的video文件地址，对于slideslive需要先找出其vimeo_id，然后根据vimeo_id进行视频下载（这里首先下载到本地，然后再上传至服务器）。最后将爬取到的论文相关信息及pdf、video文件上传至服务器mongodb和文件夹中。
+   ##### 2.2\. 爬虫运行
+   cd crawler/crawler
+   python run_crawler.py
+   
+   ##### 2.3\. 论文基本信息 爬取
+   
+   ###### 论文题目title: 
+      papernames = response.xpath('//*[@id="title"]/a')
+      name = ""
+      for i, papername in enumerate(papernames):
+          name += str(papername.xpath('//text()').extract()[0])
+      item['title'] = name[:-16]
+   
+   ###### 论文摘要abstract:
+      item['abstract'] = response.xpath('//*[@id="main"]/div/div[1]/div/div/text()').extract()
+      
+   ###### doi:
+      item['doi'] = response.xpath('//*[@id="main"]/div/div[1]/dl/dd[13]/a/text()').extract()
+   
+   ###### 论文年月份：
+      item['month'] = response.xpath('//*[@id="main"]/div/div[1]/dl/dd[3]/text()').extract()
+      item['year'] = response.xpath('//*[@id="main"]/div/div[1]/dl/dd[4]/text()').extract()
+   ###### publisher：
+      item['publisher'] = response.xpath('//*[@id="main"]/div/div[1]/dl/dd[8]/text()').extract()
+   ###### 论文地址：
+      item['paperUrl'] = response.xpath('//*[@id="main"]/div/div[1]/dl/dd[12]/a/@href').extract()
+   
+   ###### 作者authors：
+      item_authors = response.xpath('//*[@id="main"]/p//text()').extract()
+        allname = []
+        for names in item_authors:
+            if names == ',\n':
+                continue
+            name_split = str(names).split(" ")
+            firstName = " ".join(name_split[:-1])
+            lastName = "".join(name_split[-1:])
+            allname.append({"firstName": firstName,
+                            "lastName": lastName})
+        item['authors'] = allname
+   
+   ###### 论文数据集地址：
+      if(len(response.xpath('//*[@id="main"]/div/div[1]/dl/dt[17]/text()').extract()) > 0 and str(response.xpath('//*[@id="main"]/div/div[1]/dl/dt[17]/text()').extract()[0]) == 'Dataset:'):
+            item['datasetUrl'] = response.xpath('//*[@id="main"]/div/div[1]/dl/dd[17]/a/@href').extract()
+        elif(len(response.xpath('//*[@id="main"]/div/div[1]/dl/dt[16]/text()').extract()) > 0 and str(response.xpath('//*[@id="main"]/div/div[1]/dl/dt[16]/text()').extract()[0]) == 'Dataset:'):
+            item['datasetUrl'] = response.xpath('//*[@id="main"]/div/div[1]/dl/dd[16]/a/@href').extract()
+   
+   
+   ##### 2.4\. pdf 爬取
+   
+   ###### 论文pdf文件地址：
+           if (len(response.xpath('//*[@id="main"]/div/div[1]/dl/dt[16]/text()').extract()) > 0 and str(response.xpath('//*[@id="main"]/div/div[1]/dl/dt[16]/text()').extract()[0]) == 'PDF:'):
+            item['paperPdfUrl'] = response.xpath('//*[@id="main"]/div/div[1]/dl/dd[16]/a/@href').extract()
+        else:
+            item['paperPdfUrl'] = response.xpath('//*[@id="main"]/div/div[1]/dl/dd[15]/a/@href').extract()
+   
+   
+   
+   ##### 2.5\. video 爬取
+   ACL 论文的视频主要在slideslive.com和vimeo.com两个网站，经过分析， 2020年的论文视频全在slideslive.com这个网站上，2020之前论文视频全在vimeo.com 这个网站上
+   
+   ###### 论文视频地址：
+      if (len(response.xpath('//*[@id="main"]/div/div[1]/dl/dt[18]/text()').extract()) > 0 and str(
+                response.xpath('//*[@id="main"]/div/div[1]/dl/dt[18]/text()').extract()[0]) == 'Video:'):
+            item['videoUrl'] = response.xpath('//*[@id="main"]/div/div[1]/dl/dd[18]/a/@href').extract()
+        elif (len(response.xpath('//*[@id="main"]/div/div[1]/dl/dt[17]/text()').extract()) > 0 and str(
+                response.xpath('//*[@id="main"]/div/div[1]/dl/dt[17]/text()').extract()[0]) == 'Video:'):
+            item['videoUrl'] = response.xpath('//*[@id="main"]/div/div[1]/dl/dd[17]/a/@href').extract()
+        elif (len(response.xpath('//*[@id="main"]/div/div[1]/dl/dt[16]/text()').extract()) > 0 and str(
+                response.xpath('//*[@id="main"]/div/div[1]/dl/dt[16]/text()').extract()[0]) == "Video:"):
+            item['videoUrl'] = response.xpath('//*[@id="main"]/div/div[1]/dl/dd[16]/a/@href').extract()
+        else:
+            item['videoUrl'] = ""
+            
+            
+   ###### slideslive.com 视频网站：
+      对于slideslive.com视频网站的视频爬取，需要找出其对应的vimeo_id. 首先同vimeo.com一样需要先解析论文对应的video number：
+      item['videoUrl'] = str(item['videoUrl'][0])
+                videoNum = str(item['videoUrl']).split("/")[-1]  #
+                getServiceNumBaseUrl = "https://ben.slideslive.com/player/"
+                getServiceNumBaseUrl += videoNum + "?demo=false"
+                yield scrapy.Request(url=getServiceNumBaseUrl, meta={'item': item}, callback=self.parse_slideslive_video_url,dont_filter=True)
+                
+      然后对构造的新请求返回的响应解析video service number：
+      video_service_id = json.loads(response.text)["video_service_id"]
+      video2020BaseUrl = "https://player.vimeo.com/video/" + video_service_id + \ "?loop=false&autoplay=false&byline=false&portrait=false&title=false&responsive=true&speed=true&dnt=true&controls=true"
+      yield scrapy.Request(url=video2020BaseUrl, meta={'item': response.meta['item']},callback=self.parse_slideslive_video_file, dont_filter=True)
+      
+      对于上述构造的请求的response,进一步解析其.mpu文件地址：
+       pattern = re.compile(r'"url":"https://vod-progressive.akamaized.net/exp=([0-9]+)(~)([a-zA-Z]+)(=%)([a-zA-Z0-9=%-.~/]+)*(.mp4)',re.I) 
+        result_list = pattern.findall(str(response.xpath('/html/body/script[1]/text()').extract()))
+        video360_url = "https://vod-progressive.akamaized.net/exp="
+        if len(result_list) > 0:
+            base360 = result_list[0]
+            for i in base360:
+                video360_url += i
+        else:
+            video360_url = ""
+        item = response.meta['item']
+        item["videoFileUrl"] = video360_url
+   
+   ###### vimeo.com 视频网站：
+      需要解析对应论文的video number：videoNum = str(item['videoUrl']).split("/")[-1]  # https://vimeo.com/305204297
+      然后用解析出的video number 构造请求地址：
+      getVideoFileUrl = "https://player.vimeo.com/video/" + videoNum + \ "/config?autopause=1&byline=0&collections=1&context=Vimeo%5CController%5CClipController.main&default_to_hd=1&outro=nothing&portrait=0&share=1&title=0&watch_trailer=0&s=b80e87994a82ae61756aacaa4290cd7392ddc270_1609659460"
+      yield scrapy.Request(url=getVideoFileUrl, meta={'item': item}, callback=self.parse_vimeo_videofile_url,dont_filter=True)
+      对于上述构造的请求response，进一步解析其视频的文件地址（查找.mp4 url地址的正则表达式）：
+      pattern = re.compile(r'"url":"https://vod-progressive.akamaized.net/exp=([0-9]+)(~)([a-zA-Z]+)(=%)([a-zA-Z0-9=%-.~/]+)*(.mp4)',re.I)  
+        result_list = pattern.findall(str(response.text))
+        video360_url = "https://vod-progressive.akamaized.net/exp="
+        if len(result_list) > 0:
+            base360 = result_list[0]
+            for i in base360:
+                video360_url += i
+        else:
+            video360_url = ""
+        item = response.meta['item']
+        item["videoFileUrl"] = video360_url
+      
+      
+            
+      
 
 #### 3、arxiv
 arxiv是一个收集物理学、数学、计算机科学、生物学等论文预印本的网站。是个可以证明论文原创性（上传时间戳）的文档收录网站。至2008年10月为止，arXiv.org已收集了超过50万篇预印本; 2014年底, 达到1百万篇的藏量。目前计算机领域的文章约以每月6000-7000的数量增加。
