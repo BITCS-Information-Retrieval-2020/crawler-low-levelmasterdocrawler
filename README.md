@@ -15,7 +15,7 @@ pass
 | [雷云霖](https://github.com/Lylist)     | 3120201035 | 系统架构搭建，scrapy健壮性优化 |
 | [魏博](https://github.com/Web985)       |            | 数据库，scrapy速度优化         |
 | [李家伟](https://github.com/Captainr22) |            | crossmind网站爬取              |
-| [马放](https://github.com/BD-MF)        |            | acl网站爬取                    |
+| [马放](https://github.com/BD-MF)        |3120201055  | acl网站爬取                    |
 | [宦紫仪]()                              |            | paperwithcode网站爬取          |
 | [蔡建](https://github.com/MrdotCai)     |            | arxiv网站爬取，IP池开发        |
 | [吴为伦]()                              |            | paperweekly网站爬取            |
@@ -32,7 +32,7 @@ pass
 
 #### 3、IP池爬取
 
-- 部署了一个爬虫服务爬取免费可用的代理IP，向http://10.4.20.69:5010/get/发送请求即可获得一个随机可用的IP，增加爬虫的健壮性
+- 部署了一个爬虫服务爬取免费可用的代理IP，向`http://10.4.20.69:5010/get/`发送请求即可获得一个随机可用的IP，增加爬虫的健壮性
 
 #### 4、线程池爬取
 
