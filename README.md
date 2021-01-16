@@ -454,6 +454,114 @@ MongoManager.select_col(col_name)
 MongoManager.push_one(item,key)
 ```
 
+##### 7.4\.数据字段定义 
+1. _id 唯一标识符 ,题目只保留英文字母部分，并转为小写
+2. arxiv_di arxiv编码
+3. doi 论文唯一标识
+4. title 文章标题 
+5. authors 列表类型，每个作者包括 firstName 字段和 lastName 字段 
+6. year 出版年份
+7. publisher 发表期刊
+8. keywords 论文关键词
+9. abstract 摘要 
+10. subjects 论文分类 
+11. paperUrl 论文在网上的url 
+12. paperPath 论文在服务器上的路径
+13. paperPdfUrl 论文pdf下载url
+14. paperContent 论文pdf解析后的内容， text 是全文内容， subtitiles 是章节标题， subtexts 是章节内容 
+15. references 参考文献，列表格式，包括 reftitle，refAuthors，refYear，refPublisher 
+16. videoUrl 视频在网上的url 
+17. videoPath 视频存在服务器上的路径
+18. videoFileUrl 视频下载Url
+19. videoContent 包括起始时间列表 StartTime 终止时间列表 EndTime 和视频文字内容列表 videoText 
+20. codeUrl 代码url 
+21. datasetUrl 数据集url
+
+```
+{ 
+   "_id": "id", 
+   "arxiv_id: "arxiv_id",
+   "doi": "doi", 
+   "title": "text", 
+   "authors": [ 
+      { 
+         "firstName": "text", 
+         "lastName": "text" 
+      },
+      { 
+         "firstName": "text", 
+         "lastName": "text" 
+      } 
+   ],
+   "year": "2020", 
+   "publisher": "acl", 
+   "keywords": [ 
+      "keyword", 
+      "keyword" 
+     ],
+   "abstract": "text", 
+   "subjects": "text", 
+   "paperUrl": "url", 
+   "paperPath": "path", 
+   "paperPdfUrl": "url", 
+   "paperContent": { 
+      "text": "textall", 
+      "subtitles":[ 
+         "subtitle1", 
+         "subtitle2", 
+         "..." 
+      ],
+      "subtexts": [ 
+         "subtext1", 
+         "subtext2", 
+         "..." 
+      ] 
+   },
+   "references": [ 
+      { 
+         "refTitle": "text", 
+         "refAuthors": [ 
+            { 
+               "refFirstName": "text", 
+               "refLastName": "text" 
+            },
+            { 
+               "refFirstName": "text", 
+               "refLastName": "text" 
+            } 
+         ],
+         "refYear": "year", 
+         "refPublisher": "journal" 
+      },
+      { 
+         "...": "..." 
+      } 
+   ],
+   "videoUrl": "url", 
+   "videoPath": "path", 
+   "videoFileUrl": "url", 
+   "videoContent":{ 
+      "StartTime": [ 
+         "time1", 
+         "time2", 
+         "..." 
+      ],
+      "EndTime": [ 
+         "time1", 
+         "time2", 
+         "..." 
+      ],
+      "videoText": [ 
+         "text1", 
+         "text2", 
+         "..." 
+      ] 
+   },
+   "codeUrl": "url", 
+   "datasetUrl": "url" 
+}
+```
+
 ## 整体效果
 
 pass
