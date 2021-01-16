@@ -183,7 +183,7 @@ Papers with Code 是一个总结了机器学习论文及其代码实现的网站
   
 - 解析论文详细页面的URL，就可以获得论的年份、标题、摘要、作者以及代码链接等信息。进行将获得的信息保存到Mongodb数据库中。
   
-- ./crawler/spiders/papersWithCode_crawler.py文件中是具体的实现代码。
+./crawler/spiders/papersWithCode_crawler.py文件中是具体的实现代码。
 
 
 #### 5、paperweekly
