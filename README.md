@@ -17,7 +17,7 @@
 | [李家伟](https://github.com/Captainr22) | 3120201036 | crossmind网站爬取              |
 | [马放](https://github.com/BD-MF)        |3120201055  | acl网站爬取                    |
 | [宦紫仪](https://github.com/hsnowsunny) |3220200891  | paperwithcode网站爬取          |
-| [蔡建](https://github.com/MrdotCai)     |            | arxiv网站爬取，IP池开发        |
+| [蔡建](https://github.com/MrdotCai)     | 3120201001 | arxiv网站爬取，IP池开发        |
 | [吴为伦](https://github.com/PoolSon)    |3120201082  | paperweekly网站爬取            |
 
 ## 功能特色
@@ -163,8 +163,252 @@ Paperweekly的推荐论文页面是用JavaScript渲染的动态加载页面，�
 通过获取的论文编号拼接上arXiv网站的前缀，获得了论文页面的url，通过常规的arXiv爬取方式，去获得论文的标题、作者、摘要等信息，最终保存到数据库中，具体代码实现在./crawler/spiders/paperweekly_crawler.py文件中。
 
 #### 6、IP池服务
+在爬取arxiv.org网站的论文时，若访问过于频繁会出现IP被封锁的情况，研究决定使用代理IP的方式，结合scrapy的下载器中间件，对于每次的爬取，可在downloader中间件中视情况设定是否使用或者更换代理IP。
 
-@cj
+代理IP池现具备以下功能：
+
+- IP池部署在中心服务结点上，其它从结点机器可以通过http请求的方式获取json格式的代理IP信息。
+- 中心服务结点将爬取到的免费代理存于Redis数据库中。
+- ProxySpider多线程地爬取各大代理网站的免费代理，并将可使用的代理IP存放于数据库中，构成IP池。
+- 周期性地验证IP池中的代理IP是否有效，定时更新IP池状态。
+- 可更换、增加免费代理源。
+
+
+##### Requirements
+
+APScheduler==3.2.0
+werkzeug==0.15.3
+Flask==1.0
+requests==2.20.0
+lxml==4.3.1
+PyExecJS==1.5.1
+click==7.0
+gunicorn==19.9.0
+redis
+
+
+##### Redis数据库搭建
+
+Redis 是完全开源的，遵守 BSD 协议，是一个高性能的 key-value 数据库。
+
+- 下载及编译
+
+```shell
+wget http://download.redis.io/releases/redis-6.0.8.tar.gz
+tar xzf redis-6.0.8.tar.gz
+cd redis-6.0.8
+make
+```
+
+- 修改配置文件789行密码
+
+```shell
+vi redis.conf
+
+ 777 #
+ 778 # The format of the external ACL user file is exactly the same as the
+ 779 # format that is used inside redis.conf to describe users.
+ 780 #
+ 781 # aclfile /etc/redis/users.acl
+ 782 
+ 783 # IMPORTANT NOTE: starting with Redis 6 "requirepass" is just a  compatiblity
+ 784 # layer on top of the new ACL system. The option effect will be just setting
+ 785 # the password for the default user. Clients will still authenticate using
+ 786 # AUTH <password> as usually, or more explicitly with AUTH default <password>
+ 787 # if they follow the new protocol: both will work.
+ 788 #
+ 789 requirepass 318redis                                                        
+ 790 
+ 791 # Command renaming (DEPRECATED).
+ 792 #
+ 793 # ------------------------------------------------------------------------
+ 794 # WARNING: avoid using this option if possible. Instead use ACLs to remove
+ 795 # commands from the default user, and put them only in some admin user you
+ 796 # create for administrative purposes.
+ 797 # ------------------------------------------------------------------------
+ 798 #
+ 799 # It is possible to change the name of dangerous commands in a shared
+ 800 # environment. For instance the CONFIG command may be renamed into something
+ 801 # hard to guess so that it will still be available for internal-use tools
+ 802 # but not available for general clients.
+```
+
+- 启动redis服务
+
+```shell
+cd src
+./redis-server ../redis.conf
+```
+
+- 检查redis是否启动
+
+```shell
+redis-cli
+```
+
+
+##### IP池配置步骤
+
+- 获取代码
+
+- 安装依赖
+
+  ```python
+  pip install -r requirements.txt
+  ```
+
+- 更新setting.py配置文件
+
+  ```python
+  # 配置API服务
+  HOST = "0.0.0.0"               # IP
+  PORT = 5010                    # 监听端口
+  
+  # 配置数据库
+  DB_CONN = 'redis://:pwd@127.0.0.1:6379/0'
+  
+  # 配置 ProxyFetcher
+  PROXY_FETCHER = [
+      "freeProxy01",      # 这里是启用的代理抓取方法名，所有fetch方法位于				                    # fetcher/proxyFetcher.py
+      "freeProxy02",
+      # ....
+  ]
+  ```
+
+- 启动IP池服务
+
+  ```python
+  # 启动调度程序
+  python proxyPool.py schedule
+  # 启动webAPI服务
+  python proxyPool.py server
+  ```
+
+
+##### 调度细节
+
+- Python定时任务框架APScheduler定时进行代理IP的爬取和可用性检验。
+
+- 调度设置
+
+  ```python
+  executors = {
+          'default': {'type': 'threadpool', 'max_workers': 20},
+          'processpool': ProcessPoolExecutor(max_workers=5)
+      }
+      '''
+      默认使用线程调度任务，max_workers：最大线程/进程数量
+      '''
+  job_defaults = {
+          'coalesce': False,
+          'max_instances': 10
+      }
+      """
+      max_instances: 每个job在同一时刻能够运行的最大实例数,默认情况下为1个,可以指定为     更大值,这样即使上个job还没运行完同一个job又被调度的话也能够再开一个线程执行
+      coalesce:当由于某种原因导致某个job积攒了好几次没有实际运行（比如说系统挂了5分钟后     恢复，有一个任务是每分钟跑一次的，按道理说这5分钟内本来是“计划”运行5次的，但实际没有     执行），如果coalesce为True，下次这个job被submit给executor时，只会执行1次，也就     是最后这次，如果为False，那么会执行5次。
+      """
+  ```
+
+- 每四分钟运行一次runProxyFetcher进行免费代理IP的爬取。
+
+- 每两分钟运行一次runProxyCheck进行代理IP的可行性检验，对于IP池内的存在的所有代理IP，发送一次模拟代理HEADER请求，若任务超时，则判定失败，代理IP暂时不可用。
+
+  ```python
+  # --- proxy validator ---
+  VERIFY_URL = "http://www.baidu.com" # 检验使用的URL
+  VERIFY_TIMEOUT = 10
+  MAX_FAIL_COUNT = 0
+  ```
+
+
+##### webAPI使用
+
+- API接口
+
+启动web服务后, 默认配置下会开启 http://10.4.20.69:5010 的api接口服务:
+
+| api         | method | Description      | arg           |
+| ----------- | ------ | ---------------- | ------------- |
+| /           | GET    | api介绍          | None          |
+| /get        | GET    | 随机获取一个代理 | None          |
+| /get_all    | GET    | 获取所有代理     | None          |
+| /get_status | GET    | 查看代理数量     | None          |
+| /delete     | GET    | 删除代理         | proxy=host:ip |
+
+- /get获取的json
+
+```python
+{
+    "check_count":879, # 此代理IP被检验的次数
+    "fail_count":0, # 检验失败次数
+    "last_status":1, # 上一次检验状态，1-成功
+    "last_time":"2021-01-16 15:46:19", # 上一次检验时间
+    "proxy":"183.232.231.133:80", # 代理IP
+    "region":"",
+    "source":"",
+    "type":""
+}
+```
+
+
+##### 代理源
+
+目前实现的采集免费代理网站有：
+
+- 无忧代理
+- 66代理
+- 西刺代理
+- 全网代理
+- 快代理
+- 代理盒子
+- 云代理
+- IP海
+- 免费代理库
+- 89代理
+- 西拉代理
+
+
+##### 代理扩展
+
+项目默认包含几个免费的代理获取源，但是免费的毕竟质量有限，所以如果直接运行可能拿到的代理质量不理想。所以，提供了代理获取的扩展方法。
+
+　　添加一个新的代理源方法如下:
+
+* 1、首先在[ProxyFetcher](https://github.com/jhao104/proxy_pool/blob/1a3666283806a22ef287fba1a8efab7b94e94bac/fetcher/proxyFetcher.py#L21)类中添加自定义的获取代理的静态方法，
+  该方法需要以生成器(yield)形式返回`host:ip`格式的代理，例如:
+
+```python
+class ProxyFetcher(object):
+    # ....
+
+    # 自定义代理源获取方法
+    @staticmethod
+    def freeProxyCustom1():  # 命名不和已有重复即可
+
+        # 通过某网站或者某接口或某数据库获取代理
+        # 假设你已经拿到了一个代理列表
+        proxies = ["x.x.x.x:3128", "x.x.x.x:80"]
+        for proxy in proxies:
+            yield proxy
+        # 确保每个proxy都是 host:ip正确的格式返回
+```
+
+* 2、添加好方法后，修改[setting.py](https://github.com/jhao104/proxy_pool/blob/1a3666283806a22ef287fba1a8efab7b94e94bac/setting.py#L47)文件中的`PROXY_FETCHER`项：
+
+　　在`PROXY_FETCHER`下添加自定义方法的名字:
+
+```python
+PROXY_FETCHER = [
+    "freeProxy01",    
+    "freeProxy02",
+    # ....
+    "freeProxyCustom1"  #  # 确保名字和你添加方法名字一致
+]
+```
+
+
+　　`schedule` 进程会每隔一段时间抓取一次代理，下次抓取时会自动识别调用你定义的方法。
+
 
 #### 7、数据库
 
