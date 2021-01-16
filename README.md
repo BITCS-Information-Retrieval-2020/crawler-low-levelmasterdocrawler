@@ -147,7 +147,8 @@ python dataManager.py
 
 - 依据规律的URL格式定制爬虫，增量式爬取
 
-  访问arxiv站点可构造适当的URL，按月获取当月的所有论文简要信息，如：https://arxiv.org/list/cs/2001?skip=0&show=1000，表示获取2020年1月从第一个记录开始的1000条论文记录。
+  访问arxiv站点可构造适当的URL，按月获取当月的所有论文简要信息，如：https://arxiv.org/list/cs/2001?skip=0&show=1000
+  表示获取2020年1月从第一个记录开始的1000条论文记录。
 
   运行爬虫之前，可以自由定制多个URL存于start_urls.txt文件中，作为本次爬取的目标。
 
