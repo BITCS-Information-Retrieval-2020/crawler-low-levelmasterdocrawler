@@ -18,7 +18,7 @@ pass
 | [马放](https://github.com/BD-MF)        |3120201055  | acl网站爬取                    |
 | [宦紫仪](https://github.com/hsnowsunny) |3220200891  | paperwithcode网站爬取          |
 | [蔡建](https://github.com/MrdotCai)     |            | arxiv网站爬取，IP池开发        |
-| [吴为伦]()                              |            | paperweekly网站爬取            |
+| [吴为伦](https://github.com/PoolSon)    |3120201082  | paperweekly网站爬取            |
 
 ## 功能特色
 
