@@ -173,7 +173,7 @@ python dataManager.py
 Papers with Code 是一个总结了机器学习论文及其代码实现的网站。它提供了很多论文都是有GitHub代码的。它对机器学习做了任务分类，可以根据类别检索相关的文章。它创建了一个免费开放的机器学习论文、代码和评估表资源。
 
 ##### 工作模式
-  从https://www.paperswithcode.com/sota 中可以看出，Papers with Code把所有文章按照他们完成的任务分成不同的类别。包括Computer Vision，Natural Language Processing，Medical，Methodology等。在每个大的类别下，会划分出很多小的任务。在每个任务中，会包含很多子任务。
+  从https://www.paperswithcode.com/sota 中可以看出，Papers with Code把所有文章按照他们完成的任务分成不同的类别。包括Computer Vision，Natural Language Processing，Medical，Methodology等。在每个大的类别下，会划分出很多小的任务tasks。在每个任务中，会包含很多子任务subtasks。
 
 - 在爬取时，遍历访问每个类别，然后依次遍历每个类别中的任务，接着对每个任务的子任务进行遍历。
 
