@@ -88,11 +88,11 @@ pip install -r requirements.txt
 
 Crossminds网站包括**论文的基本信息**（包括论文的名称、会议名称、作者信息、论文描述等），论文的**视频url信息**，**部分论文的pdf与code信息等**。我们按Conference分类爬取所有会议中的视频以及论文信息，共3100条视频数据。
 
-#### 1.1\. 整体流程
+##### 1.1\. 整体流程
 
 Crossminds视频爬取流程主要分为两步：第一，在网页把所有视频的url信息爬取下来保存到本地。第二、通过不同方式访问不同类型的url进行视频爬取。
 
-#### 1.2\. 论文信息爬取
+##### 1.2\. 论文信息爬取
 Crossminds视频页是动态加载页面，我们分析了三种处理动态加载页面的方式：直接通过构造requests请求访问数据、通过selenium爬取数据以及通过splash爬取数据。由于直接通过requests访问数据的爬取速度比其他两种方式快得多，所以采用这种方式来爬取。具体过程如下：
 
    - 找到浏览器向服务器请求数据的url：https://api.crossminds.io/web/content/bycategory
@@ -102,7 +102,7 @@ Crossminds视频页是动态加载页面，我们分析了三种处理动态加�
    - 使用代码模拟浏览器向数据库发送请求，动态构造请求参数得到所有数据。(先通过前一个页面得到目前所有会议的名称信息，请求参数中初始化的**offset**为0，接下来的请求参数从**next_request**中获取，当返回数据为**null**时，将**category**设置成下一个会议，直至所有数据爬取结束)。
    - 将数据以csv格式保存到本地。
 
-#### 1.3\. 视频爬取
+##### 1.3\. 视频爬取
 Crossminds中的视频包含三种格式：youtube_video,m3u8_video和Vimeo_video(3100条数据中仅有一条)。我们主要对前两种格式的video视频进行爬取。
 1. youtube_video使用第三方工具pytube对youtube视频进行下载。
 
@@ -119,10 +119,10 @@ Crossminds中的视频包含三种格式：youtube_video,m3u8_video和Vimeo_vide
 4. 构造ip池下载视频
 虽然每10秒启动一个线程，对线程池进行了一定的限制，但这种快速访问仍然会造成封ip的现象，所以我们使用了ip代理池，访问每一个视频url的ip都是不同的，不会造成ip被封的问题。
 
-#### 1.4\. pdf以及code的爬取
+##### 1.4\. pdf以及code的爬取
 通过**正则表达式**解析**description**内容可以得到**300条**左右的pdf和code信息。然而由于视频数量远远大于pdf和code的数量，所以我们主要的pdf来源于小组其他成员爬取的**arxiv**和**paperwithcode**中的数据。我们以paper的title作为标识符对论文及pdf和code进行匹配，最终能为1686条视频匹配到其对应的pdf和code。
 
-#### 1.5\. 具体运行
+##### 1.5\. 具体运行
 爬取Crossminds论文信息
 ```
 python crawl_data.py
