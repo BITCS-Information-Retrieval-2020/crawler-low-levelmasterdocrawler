@@ -14,7 +14,7 @@ pass
 | --------------------------------------- | ---------- | ------------------------------ |
 | [雷云霖](https://github.com/Lylist)     | 3120201035 | 系统架构搭建，scrapy健壮性优化 |
 | [魏博](https://github.com/Web985)       | 3120201080 | 数据库，scrapy速度优化         |
-| [李家伟](https://github.com/Captainr22) |            | crossmind网站爬取              |
+| [李家伟](https://github.com/Captainr22) | 3120201036 | crossmind网站爬取              |
 | [马放](https://github.com/BD-MF)        |3120201055  | acl网站爬取                    |
 | [宦紫仪](https://github.com/hsnowsunny) |3220200891  | paperwithcode网站爬取          |
 | [蔡建](https://github.com/MrdotCai)     |            | arxiv网站爬取，IP池开发        |
@@ -143,11 +143,7 @@ pass
   │   ├── download_video.py
   │   ├── download_youtube_video.py
   │   ├── log.py
-  │   ├── m3u8
-  │   ├── m3u8_video
-  │   ├── outputfinal
-  │   ├── rename.py
-  │   └── youtube_video
+  │   └── rename.py
   ├── download //下载本地存储文件夹
   ├── logs //log日志存储文件夹
   ├── output.json //爬取结果本地备份文件
