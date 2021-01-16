@@ -44,7 +44,9 @@ pass
 
 ## 系统架构
 
-pass
+![系统架构](./extra/system_ach.jpg)
+
+
 
 ## 执行方法及原理
 
