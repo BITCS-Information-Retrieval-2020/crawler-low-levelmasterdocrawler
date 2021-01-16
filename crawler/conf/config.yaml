@@ -10,8 +10,8 @@ CONCURRENT_REQUESTS: 16
 # 爬虫pipeline选择
 ITEM_PIPELINES:
   # arxiv
- crawler.pipelines.ArxivPDFFetcherPipeline: 1
- crawler.pipelines.ArxivJsonWriterPipeline: 2
+  crawler.pipelines.ArxivPDFFetcherPipeline: 1
+  crawler.pipelines.ArxivJsonWriterPipeline: 2
   # acl
   # crawler.pipelines.ACLPaperPdfFilePipeline: 1
   # crawler.pipelines.ACLPaperVideoFilePipeline: 2
