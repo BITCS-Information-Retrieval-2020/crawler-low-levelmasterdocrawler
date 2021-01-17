@@ -25,9 +25,6 @@ ProxyPool 爬虫代理IP池
 
 * 支持版本: ![](https://img.shields.io/badge/Python-2.x-green.svg) ![](https://img.shields.io/badge/Python-3.x-blue.svg)
 
-* 测试地址: http://118.24.52.95 (单机勿压)
-
-
 ### 运行项目
 
 ##### 下载代码:
