@@ -28,7 +28,7 @@ class XmlToJson(object):
             return None
 
         # keywords
-        #keywords = s_header.find(name='keywords').find_all(name='term')
+        # keywords = s_header.find(name='keywords').find_all(name='term')
         keywords = s_header.find(name='keywords')
         if(keywords):
             keywords = keywords.find_all(name='term')
@@ -86,7 +86,7 @@ class XmlToJson(object):
                 elif(child.name == 'ref'):  # type=bibr/table/figure
                     continue
                 else:
-                    #text += " " + child.text
+                    # text += " " + child.text
                     child_text = child.text
                     if (child_text[0] in string.punctuation):
                         text = text.strip() + child_text.strip()

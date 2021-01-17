@@ -22,7 +22,6 @@ class PapersWithCodeSpider(scrapy.Spider):
     url_preflix = "https://paperswithcode.com"
 
     def parse(self, response):
-        fields = response.css("h4 a::text").getall()
         # yield dict(zip(range(len(fields)), fields))
         next_pages = response.css("div.sota-all-tasks a::attr(href)").getall()
         for page in next_pages:
@@ -32,7 +31,6 @@ class PapersWithCodeSpider(scrapy.Spider):
             logger.info("1完成 " + next_page)
 
     def parse_subfields(self, response):
-        field = response.css("h1::text").get()
         subfields = response.css("h4::text").getall()
         # map(str.strip, subfields)
         for i in range(len(subfields)):
@@ -55,7 +53,6 @@ class PapersWithCodeSpider(scrapy.Spider):
 
     def parse_tasks(self, response):
         # subfield = response.meta["subfield"]
-        tasks = response.css("h1.card-title::text").getall()
         subtask_pages = response.css("div.card a::attr(href)").getall()
         c = 0
         for page in subtask_pages:
@@ -70,7 +67,6 @@ class PapersWithCodeSpider(scrapy.Spider):
 
     def parse_subtasks(self, response):
         # task = response.meta["task"]
-        subtasks = response.css("div:not(.text-center).paper a::text").getall()
         paper_pages = response.css(
             "div.text-center.paper a::attr(href)").getall()
         c = 0
@@ -86,21 +82,18 @@ class PapersWithCodeSpider(scrapy.Spider):
 
     def parse_abstracts(self, response):
         # paper = response.meta["paper"]
-        # title = response.xpath("/html[@class='hydrated']/body/div[@class='container']/div[@class='container content content-buffer']/div[@class='paper-title']/div[@class='row']/div[@class='col-md-12']/h1/text()")[0].extract()
         title = response.css("div.paper-title h1::text").get().strip()
         # title=response.css("div.paper-title::text").get()
         a1 = str(response.css("div.paper-abstract p::text").get()).strip()
         a2 = str(response.css("div.paper-abstract p span+span::text").get()).strip()
         abstract = a1 + a2
         # content = response.xpath(
-        #     "/html[@class='hydrated']/body/div[@class='container']/div[@class='container content content-buffer']/div[@class='paper-title']/div[@class='row']/div[@class='col-md-12']/div[@class='authors']/p")
         # year=content.xpath("./span[@class='author-span'][1]/text()").extract()
         # year=response.css("span.author-span.xh-highlight::text").extract()
         date = response.css("div.authors span::text")[0].extract()
         dates = date.split(" ")
         year = dates[-1]
         authors = []
-        # paper_url =response.xpath("/html[@class='hydrated']/body/div[@class='container']/div[@class='container content content-buffer']/div[@class='paper-abstract']/div[@class='row']/div[@class='col-md-12']/a[@class='badge badge-light']/@herf").extract()
         paper_urls = response.css(
             "div.paper-abstract a::attr(href)").extract()[1]
         paper_url = paper_urls.replace(".pdf", "")

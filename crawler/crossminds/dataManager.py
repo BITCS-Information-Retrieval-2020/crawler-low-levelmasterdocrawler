@@ -126,7 +126,7 @@ class MongoManager:
 
 
 class FileManager:
-    def __init__(self, host="10.4.20.69", port=22, user_name, passwd):
+    def __init__(self, host="10.4.20.69", port=22, user_name="123", passwd="fwee"):
         self.host = host
         self.port = port
         self.user = user_name
@@ -134,8 +134,7 @@ class FileManager:
         self.ssh_client = paramiko.SSHClient()
         self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy)
         self.ssh_client.connect(host, port, user_name, passwd)
-        self.scpclient = SCPClient(
-            self.ssh_client.get_transport(), socket_timeout=15.0)
+        self.scpclient = SCPClient(self.ssh_client.get_transport(), socket_timeout=15.0)
 
     def upload_file(self, local_path, remote_path):
         try:

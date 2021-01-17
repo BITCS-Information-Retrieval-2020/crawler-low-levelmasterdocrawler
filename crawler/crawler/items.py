@@ -61,4 +61,4 @@ class PaperweeklyItem(scrapy.Item):
     paperUrl = scrapy.Field()
     codeUrl = scrapy.Field()
     paperPath = scrapy.Field()
-    #file_urls = scrapy.Field()
+    # file_urls = scrapy.Field()

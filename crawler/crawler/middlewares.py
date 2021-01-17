@@ -130,7 +130,7 @@ class ArxivDownloaderMiddleware:
         # - or raise IgnoreRequest: process_exception() methods of
         #   installed downloader middleware will be called
         timeNow = datetime.datetime.now()
-        timeInterval = (timeNow-self.timeStamp).seconds
+        timeInterval = (timeNow - self.timeStamp).seconds
         print(timeInterval)
         # 使用代理
         if self.enProxy:

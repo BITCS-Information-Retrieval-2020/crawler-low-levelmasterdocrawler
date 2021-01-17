@@ -18,19 +18,19 @@ class grobid_client(ApiClient):
         self.config = None
         self._load_config(config_path)
         self.xmlToJson = XmlToJson()
-        #self.errorPdfs = []
+        # self.errorPdfs = []
 
     def _load_config(self, path='./config.json'):
         """
-        Load the json configuration 
+        Load the json configuration
         """
         config_json = open(path).read()
         self.config = json.loads(config_json)
 
         # test if the server is up and running...
-        the_url = 'http://'+self.config['grobid_server']
+        the_url = 'http://' + self.config['grobid_server']
         if len(self.config['grobid_port']) > 0:
-            the_url += ":"+self.config['grobid_port']
+            the_url += ":" + self.config['grobid_port']
         the_url += "/api/isalive"
         r = requests.get(the_url)
         status = r.status_code
@@ -52,10 +52,10 @@ class grobid_client(ApiClient):
             )
         }
 
-        the_url = 'http://'+self.config['grobid_server']
+        the_url = 'http://' + self.config['grobid_server']
         if len(self.config['grobid_port']) > 0:
-            the_url += ":"+self.config['grobid_port']
-        the_url += "/api/"+service
+            the_url += ":" + self.config['grobid_port']
+        the_url += "/api/" + service
 
         # set the GROBID parameters
         the_data = {}
@@ -65,7 +65,7 @@ class grobid_client(ApiClient):
         if consolidate_header:
             the_data['consolidateHeader'] = '1'
         if consolidate_citations:
-            the_data['consolidateCitations'] = '1'   
+            the_data['consolidateCitations'] = '1'
         if teiCoordinates:
             the_data['teiCoordinates'] = self.config['coordinates']
         """

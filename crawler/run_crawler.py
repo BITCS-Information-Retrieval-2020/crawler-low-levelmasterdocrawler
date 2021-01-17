@@ -40,8 +40,7 @@ def main():
         "COOKIES_ENABLED": crawler_config["COOKIES_ENABLED"],
         "RETRY_ENABLED": crawler_config["RETRY_ENABLED"],
         "RETRY_TIMES": crawler_config["RETRY_TIMES"],
-        "USER_AGENT": crawler_config["USER_AGENT"]
-        })
+        "USER_AGENT": crawler_config["USER_AGENT"]})
     runner = CrawlerRunner(crawler_settings)
     configure_logging(
         {

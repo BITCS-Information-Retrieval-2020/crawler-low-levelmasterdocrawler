@@ -24,13 +24,13 @@ class AclwebSpider(scrapy.Spider):
     allowed_domains = ['aclweb.org']
     # ACL中不同的会议
     # 修改venues 会议列表就可以了  没有写成 .txt 的形式 爬取的时候可以一个具体会议一个具体会议的爬取 例如 venues=['acl']
-    venues = ['acl', 'anlp', 'cl', 'conlp', 'eacl', 'emnlp','aacl',
+    venues = ['acl', 'anlp', 'cl', 'conlp', 'eacl', 'emnlp', 'aacl',
               'findings', 'naacl', 'semeval', '*sem', 'tacl', 'wmt', 'ws']
     base_url = "https://www.aclweb.org/anthology/venues/"
     venue = 0
     # 开始url
     # 'https://www.aclweb.org/anthology/venues/emnlp/'  #取到具体会议的url ，例如EMNLP
-    start_urls = [base_url+venues[venue]]
+    start_urls = [base_url + venues[venue]]
 
     def parse(self, response):
         # //*[@id="main-container"]/div/div[2]/main/table[1]/tbody/tr/th/a/@href
@@ -45,7 +45,7 @@ class AclwebSpider(scrapy.Spider):
         if self.venue < 14:
             self.venue += 1
             logger.info("开始处理会议：" + self.venues[self.venue])
-            emnlpurl = self.base_url+self.venues[self.venue]
+            emnlpurl = self.base_url + self.venues[self.venue]
             logger.info("处理会议：" + emnlpurl)
             yield scrapy.Request(emnlpurl, callback=self.parse, dont_filter=True)
 
@@ -96,7 +96,7 @@ class AclwebSpider(scrapy.Spider):
         else:
             item['year'] = ""
         item["year"] = item["year"]
-        
+
         item['publisher'] = response.xpath(
             '//*[@id="main"]/div/div[1]/dl/dd[8]/text()').extract()
         if len(item['publisher']) > 0:
@@ -110,7 +110,8 @@ class AclwebSpider(scrapy.Spider):
         else:
             item['paperUrl'] = ""
 
-        if (len(response.xpath('//*[@id="main"]/div/div[1]/dl/dt[16]/text()').extract()) > 0 and str(response.xpath('//*[@id="main"]/div/div[1]/dl/dt[16]/text()').extract()[0]) == 'PDF:'):
+        if (len(response.xpath('//*[@id="main"]/div/div[1]/dl/dt[16]/text()').extract()) > 0
+                and str(response.xpath('//*[@id="main"]/div/div[1]/dl/dt[16]/text()').extract()[0]) == 'PDF:'):
             item['paperPdfUrl'] = response.xpath(
                 '//*[@id="main"]/div/div[1]/dl/dd[16]/a/@href').extract()
         else:
@@ -130,10 +131,12 @@ class AclwebSpider(scrapy.Spider):
                             "lastName": lastName})
 
         item['authors'] = allname
-        if(len(response.xpath('//*[@id="main"]/div/div[1]/dl/dt[17]/text()').extract()) > 0 and str(response.xpath('//*[@id="main"]/div/div[1]/dl/dt[17]/text()').extract()[0]) == 'Dataset:'):
+        if(len(response.xpath('//*[@id="main"]/div/div[1]/dl/dt[17]/text()').extract()) > 0
+                and str(response.xpath('//*[@id="main"]/div/div[1]/dl/dt[17]/text()').extract()[0]) == 'Dataset:'):
             item['datasetUrl'] = response.xpath(
                 '//*[@id="main"]/div/div[1]/dl/dd[17]/a/@href').extract()
-        elif(len(response.xpath('//*[@id="main"]/div/div[1]/dl/dt[16]/text()').extract()) > 0 and str(response.xpath('//*[@id="main"]/div/div[1]/dl/dt[16]/text()').extract()[0]) == 'Dataset:'):
+        elif(len(response.xpath('//*[@id="main"]/div/div[1]/dl/dt[16]/text()').extract()) > 0
+                and str(response.xpath('//*[@id="main"]/div/div[1]/dl/dt[16]/text()').extract()[0]) == 'Dataset:'):
             item['datasetUrl'] = response.xpath(
                 '//*[@id="main"]/div/div[1]/dl/dd[16]/a/@href').extract()
         else:
@@ -176,7 +179,9 @@ class AclwebSpider(scrapy.Spider):
                 videoNum = str(item['videoUrl']).split(
                     "/")[-1]  # https://vimeo.com/305204297
                 getVideoFileUrl = "https://player.vimeo.com/video/" + videoNum + \
-                    "/config?autopause=1&byline=0&collections=1&context=Vimeo%5CController%5CClipController.main&default_to_hd=1&outro=nothing&portrait=0&share=1&title=0&watch_trailer=0&s=b80e87994a82ae61756aacaa4290cd7392ddc270_1609659460"
+                    "/config?autopause=1&byline=0&collections=1&context=Vimeo%5CCo" + \
+                    "ntroller%5CClipController.main&default_to_hd=1&outro=nothing&portrait=" + \
+                    "0&share=1&title=0&watch_trailer=0&s=b80e87994a82ae61756aacaa4290cd7392ddc270_1609659460"
 
                 yield scrapy.Request(url=getVideoFileUrl, meta={'item': item}, callback=self.parse_vimeo_videofile_url,
                                      dont_filter=True)
@@ -209,8 +214,9 @@ class AclwebSpider(scrapy.Spider):
 
     def parse_slideslive_video_url(self, response):
         video_service_id = json.loads(response.text)["video_service_id"]
-        video2020BaseUrl = "https://player.vimeo.com/video/" + video_service_id + \
-            "?loop=false&autoplay=false&byline=false&portrait=false&title=false&responsive=true&speed=true&dnt=true&controls=true"
+        video2020BaseUrl = "https://player.vimeo.com/video/" + video_service_id
+        + "?loop=false&autoplay=false&byline=false&portrait=false&title=false&r"
+        + "esponsive=true&speed=true&dnt=true&controls=true"
         yield scrapy.Request(url=video2020BaseUrl, meta={'item': response.meta['item']},
                              callback=self.parse_slideslive_video_file, dont_filter=True)
 

@@ -44,7 +44,8 @@ class ArxivAutoSpider(scrapy.Spider):
         for url in self.start_urls:
             yield scrapy.Request(url=url, callback=self.parse, meta={"turnPage": True})
 
-    def parse(self, response):  # 这里从每月的页面上爬取每个论文展示页面的URL，如果是最后一个月则跳到下一年的一月重新开始
+    def parse(self, response):
+        # 这里从每月的页面上爬取每个论文展示页面的URL，如果是最后一个月则跳到下一年的一月重新开始
         # 爬取本页的paper链接
         paper_links = response.xpath(
             "//*[@id='dlpage']/dl/dt/span/a[1]/@href").extract()
@@ -52,16 +53,16 @@ class ArxivAutoSpider(scrapy.Spider):
         for link in paper_links:
             full_link = self.arxiv_domain + link
             # 页内爬取的请求优先级高于翻页请求
-            yield scrapy.Request(full_link, callback=self.parse_paper, meta={'turnPage': False, "paperYear": self.start_year}, priority=1)
+            yield scrapy.Request(full_link, callback=self.parse_paper,
+                                 meta={'turnPage': False, "paperYear": self.start_year}, priority=1)
 
         # 本月内翻页
         page_mark = response.xpath(
             "//*[@id='dlpage']/small[1]/b/text()").extract()
         all_marks = response.xpath(
             "//*[@id='dlpage']/small[1]/a/text()").extract()
-        # print("-------------------------", self.start_year + "." + self.start_month, "crawlingPapers:" , page_mark[0], "-------------------------" + "\n")
-        logger.info("-------------------------" + self.start_year + "." + self.start_month +
-                    "crawlingPapers: " + page_mark[0] + "-------------------------")
+        logger.info("-------------------------" + self.start_year + "." + self.start_month
+                    + "crawlingPapers: " + page_mark[0] + "-------------------------")
         page_mark = int(re.findall(r'-?\d+', page_mark[0])[0])
         last_mark = int(re.findall(r'-?\d+', all_marks[-1])[0])
         print(page_mark, last_mark)
@@ -72,16 +73,15 @@ class ArxivAutoSpider(scrapy.Spider):
                 "skip=" + self.skip_point + "&show=" + self.show_step
             yield scrapy.Request(next_page, callback=self.parse, meta={"turnPage": True})
         else:  # 翻到最后一页了，准备开始爬下一个月的
-            # print("-------------------------", self.start_year + "." + self.start_month, "crawlingPapers:" , "ALL DONE", "-------------------------", "\n")
-            logger.info("-------------------------" + self.start_year + "." + self.start_month +
-                        "crawlingPapers:" + "ALL DONE" + "-------------------------" + "\n")
+            logger.info("-------------------------" + self.start_year + "." + self.start_month
+                        + "crawlingPapers:" + "ALL DONE" + "-------------------------" + "\n")
             self.skip_point = '0'
             if self.start_month == "12":
                 self.start_year = str(int(self.start_year) + 1)
                 self.start_month = "01"
             else:
                 self.start_month = str(int(self.start_month) + 1).zfill(2)
-            if int(self.start_year+self.start_month) < int(self.end_year+self.end_month):
+            if int(self.start_year + self.start_month) < int(self.end_year + self.end_month):
                 next_month = "https://arxiv.org/list/cs/" + \
                     self.start_year[2:4] + self.start_month + "?" + \
                     "skip=" + self.skip_point + "&show=" + self.show_step
@@ -89,8 +89,8 @@ class ArxivAutoSpider(scrapy.Spider):
                 yield scrapy.Request(next_month, callback=self.parse, meta={"turnPage": True})
             else:  # 更新完成
                 # print("-------------------------", "crawlingEnd:", "Up-to-date already.", "-------------------------", "\n")
-                logger.info("-------------------------" + "crawlingEnd: " +
-                            "Up-to-date already." + "-------------------------" + "\n")
+                logger.info("-------------------------" + "crawlingEnd: "
+                            + "Up-to-date already." + "-------------------------" + "\n")
 
     def parse_paper(self, response):  # 爬取单个paper信息
         print("parse_status:", response.status)
@@ -153,7 +153,8 @@ class ArxivSpider(scrapy.Spider):
         for link in paper_links:
             full_link = self.arxiv_domain + link
             # 页内爬取的请求优先级高于翻页请求
-            yield scrapy.Request(full_link, callback=self.parse_paper, meta={'turnPage': False, "paperYear": "20" + year}, priority=1)
+            yield scrapy.Request(full_link, callback=self.parse_paper,
+                                 meta={'turnPage': False, "paperYear": "20" + year}, priority=1)
 
     def parse_paper(self, response):  # 爬取单个paper信息
         print("parse_status:", response.status)

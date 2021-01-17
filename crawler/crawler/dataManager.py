@@ -134,7 +134,7 @@ class MongoManager:
 
 
 class FileManager:
-    def __init__(self, host="10.4.20.69", port=22, user_name, passwd):
+    def __init__(self, host="10.4.20.69", port=22, user_name="", passwd=""):
         self.host = host
         self.port = port
         self.user = user_name
