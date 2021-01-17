@@ -25,9 +25,6 @@ ProxyPool 爬虫代理IP池
 
 * 支持版本: ![](https://img.shields.io/badge/Python-2.x-green.svg) ![](https://img.shields.io/badge/Python-3.x-blue.svg)
 
-* 测试地址: http://118.24.52.95 (单机勿压)
-
-
 ### 运行项目
 
 ##### 下载代码:
@@ -207,21 +204,6 @@ PROXY_FETCHER = [
   
   如果还有其他好的免费代理网站, 可以在提交在[issues](https://github.com/jhao104/proxy_pool/issues/71), 下次更新时会考虑在项目中支持。
 
-### 问题反馈
-
-　　任何问题欢迎在[Issues](https://github.com/jhao104/proxy_pool/issues) 中反馈，同时也可以到我的[博客](http://www.spiderpy.cn/blog/message)中留言。
-
-　　你的反馈会让此项目变得更加完美。
-
-### 贡献代码
-
-　　本项目仅作为基本的通用的代理池架构，不接收特有功能(当然,不限于特别好的idea)。
-
-　　本项目依然不够完善，如果发现bug或有新的功能添加，请在[Issues](https://github.com/jhao104/proxy_pool/issues)中提交bug(或新功能)描述，我会尽力改进，使她更加完美。
-
-　　这里感谢以下contributor的无私奉献：
-
-　　[@kangnwh](https://github.com/kangnwh)| [@bobobo80](https://github.com/bobobo80)| [@halleywj](https://github.com/halleywj)| [@newlyedward](https://github.com/newlyedward)| [@wang-ye](https://github.com/wang-ye)| [@gladmo](https://github.com/gladmo)| [@bernieyangmh](https://github.com/bernieyangmh)| [@PythonYXY](https://github.com/PythonYXY)| [@zuijiawoniu](https://github.com/zuijiawoniu)| [@netAir](https://github.com/netAir)| [@scil](https://github.com/scil)| [@tangrela](https://github.com/tangrela)| [@highroom](https://github.com/highroom)| [@luocaodan](https://github.com/luocaodan)| [@vc5](https://github.com/vc5)| [@1again](https://github.com/1again)| [@obaiyan](https://github.com/obaiyan) [@zsbh](https://github.com/zsbh)
 
 
 ### Release Notes
